@@ -20,24 +20,14 @@ def part_one(values: list[tuple[tuple[int, int], tuple[int, int]]]) -> int:
         x1, y1 = value[0]
         x2, y2 = value[1]
 
-        if x1 > x2:
-            greater_x, smaller_x = x1, x2
-        else:
-            greater_x, smaller_x = x2, x1
-
-        if y1 > y2:
-            greater_y, smaller_y = y1, y2
-        else:
-            greater_y, smaller_y = y2, y1
-
+        greater_x, smaller_x = (x1, x2) if x1 > x2 else (x2, x1)
+        greater_y, smaller_y = (y1, y2) if y1 > y2 else (y2, y1)
         for x in range(smaller_x, greater_x + 1):
-            for y in range(smaller_y, greater_y + 1):
-                lst.append((x, y))
-
+            lst.extend((x, y) for y in range(smaller_y, greater_y + 1))
     dct = defaultdict(int)
     for value in lst:
         dct[value] += 1
-    return sum(1 for value in dct.values() if value >= 2)
+    return sum(value >= 2 for value in dct.values())
 
 
 def part_two(values: list[tuple[tuple[int, int], tuple[int, int]]]) -> int:
@@ -46,22 +36,12 @@ def part_two(values: list[tuple[tuple[int, int], tuple[int, int]]]) -> int:
         x1, y1 = value[0]
         x2, y2 = value[1]
 
-        if x1 > x2:
-            greater_x, smaller_x = x1, x2
-        else:
-            greater_x, smaller_x = x2, x1
-
-        if y1 > y2:
-            greater_y, smaller_y = y1, y2
-        else:
-            greater_y, smaller_y = y2, y1
-
+        greater_x, smaller_x = (x1, x2) if x1 > x2 else (x2, x1)
+        greater_y, smaller_y = (y1, y2) if y1 > y2 else (y2, y1)
         if smaller_x == greater_x:
-            for y in range(smaller_y, greater_y + 1):
-                lst.append((smaller_x, y))
+            lst.extend((smaller_x, y) for y in range(smaller_y, greater_y + 1))
         elif smaller_y == greater_y:
-            for x in range(smaller_x, greater_x + 1):
-                lst.append((x, smaller_y))
+            lst.extend((x, smaller_y) for x in range(smaller_x, greater_x + 1))
         else:
             loop_x, loop_y = value[0]
             target_x, target_y = value[1]
@@ -82,7 +62,7 @@ def part_two(values: list[tuple[tuple[int, int], tuple[int, int]]]) -> int:
     dct = defaultdict(int)
     for value in lst:
         dct[value] += 1
-    return sum(1 for value in dct.values() if value >= 2)
+    return sum(value >= 2 for value in dct.values())
 
 
 if __name__ == '__main__':
