@@ -12,10 +12,7 @@ class Cell:
         self.number = number
 
     def __str__(self) -> str:
-        if self.called:
-            return f"({self.number})"
-        else:
-            return f"{self.number}"
+        return f"({self.number})" if self.called else f"{self.number}"
 
 
 class Row:
@@ -70,10 +67,9 @@ class Board:
 def part_one(called_numbers: list[int], boards: list[Board]) -> int:
     for called_number in called_numbers:
         for board in boards:
-            if board.mark_number(called_number):
-                if board.check_win():
-                    print(board)
-                    return sum(cell.number for cell in board.get_all_cells() if cell.called is False) * called_number
+            if board.mark_number(called_number) and board.check_win():
+                print(board)
+                return sum(cell.number for cell in board.get_all_cells() if cell.called is False) * called_number
 
 
 def part_two(called_numbers: list[int], boards: list[Board]) -> int:
@@ -81,9 +77,8 @@ def part_two(called_numbers: list[int], boards: list[Board]) -> int:
 
     for called_number in called_numbers:
         for board in boards:
-            if board.mark_number(called_number):
-                if board.check_win():
-                    winning_boards[called_number] = board
+            if board.mark_number(called_number) and board.check_win():
+                winning_boards[called_number] = board
 
     winning_number, winning_board = list(winning_boards.keys())[-1], list(winning_boards.values())[-1]
     return sum(cell.number for cell in winning_board.get_all_cells() if cell.called is False) * winning_number

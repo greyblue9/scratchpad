@@ -27,7 +27,7 @@ class Generateff(object):
         teststr = "MontyPython"
 
     def order_block(self,file,filename,data,ob_extOrderID = "",ob_extSource = "",ob_extDate = "",ob_orderType = "",ob_cusPONum = "",ob_termsName = "",ob_cusServRep = "",ob_cusType = "",ob_cusLoc = "",ob_saleStatus = "",ob_commishAllow = "",ob_holdOrderText = "",ob_dateOrderPlaced = "",ob_orderRequestShip = "",ob_orderDropDead = "",ob_salesTaxOverride = "",ob_applySalesTax1 = "",ob_applySalesTax2 = "",ob_applySalesTax3 = "",ob_applySalesTax4 = "",ob_shipTaxable = "",ob_accountSalesTax1 = "",ob_accountSalesTax2 = "",ob_accountSalesTax3 = "",ob_accountSalesTax4 = "",ob_addressDescription = "",ob_addressCompany = "",ob_address1 = "",ob_address2 = "",ob_addressCity = "",ob_addressState = "",ob_addressZip = "",ob_addressCountry = "",ob_shipMethod = "",ob_curShipping = "",ob_stsOrderShipAddressAdd = "",ob_notesArt = "",ob_notesProduction = "",ob_notesReceiving = "",ob_notesPurchasing = "",ob_notesShipping = "",ob_notesAccounting = "",ob_notesPurchasingSub = ""):
-        
+
         '''        
         if ob_orderType == "EMBROIDERY":
             ob_orderType = "26.1"
@@ -44,10 +44,10 @@ class Generateff(object):
         except KeyError:
             temp = ob_orderType
             ob_orderType = raw_input("In file " + "\"" + filename + "\"" + "the order type is " + str(data[1,14]) + ". " + "Please enter a value for \"id_OrderType\"\n")
-            ondict.update({temp, ob_orderType})
-                
+            ondict |= {temp, ob_orderType}
+                        
 
-        file.write("---- Start Order ----\n") 
+        file.write("---- Start Order ----\n")
         file.write( "ExtOrderID: %s\n" % (ob_extOrderID))
         file.write("ExtSource: %s\n" % (ob_extSource))
         file.write("date_External: %s\n"  % (ob_extDate))
@@ -148,8 +148,6 @@ class Generateff(object):
 
     def contact_block(self,file,contact,con_nameFirst = "" ,con_nameLast = "",con_department = "",con_title = "",con_phone = "",con_fax = "",con_email = "",con_stsContactAdd = "",con_stsEnableBulkEmail = ""):
         
-        if contact == "ap":
-            pass
         if contact == "webstore":
             con_nameFirst = "Webstore"
             con_phone = "800-555-5555"
@@ -235,9 +233,9 @@ class Generateff(object):
         fnap = os.path.join(cwd + r'\\input\\ap\\', filename)
         with open(fnap,'r') as file:
             data_iter = csv.reader(file, delimiter = ',', quotechar = '"')
-            data = [data for data in data_iter]
+            data = list(data_iter)
         data_array = np.asarray(data, dtype = None)
-        test.append(data_array)  
+        test.append(data_array)
         return data_array,filename
 
     def create_ap_order(self,file,data, filename):
@@ -250,25 +248,24 @@ class Generateff(object):
         file.write('\n"\n')
 
     def createfile(self):
-        file = open(cwd + "\\output\\%s_%s_%s.txt" % (i.month, i.day, i.year),'w+')
-        for x in range(len(apcsv)):
-            data, filename = self.create_array(x)
-            ots = []
-            tarr = []        
-            for j in range(len(data[:,14])):
-                if data[j,14] not in ots:
-                    ots.append(data[j,14])
-            ots = list(set(ots))
-            ots.remove("Deco Type")
-            for x in ots:
-                exec("%s1 = []" % (x))
-                exec("tarr.append(%s1)" % (x))
-                for m in range(len(data[:,:])):
-                    if data[m,14] == x:
-                        exec("%s1.append(data[m,:])" % (x))
-            for x in tarr:
-                self.create_ap_order(file, data, filename)
-        file.close()
+        with open(cwd + "\\output\\%s_%s_%s.txt" % (i.month, i.day, i.year),'w+') as file:
+            tarr = []
+            for x in range(len(apcsv)):
+                data, filename = self.create_array(x)
+                ots = []
+                for j in range(len(data[:,14])):
+                    if data[j,14] not in ots:
+                        ots.append(data[j,14])
+                ots = list(set(ots))
+                ots.remove("Deco Type")
+                for x in ots:
+                    exec(f"{x}1 = []")
+                    exec(f"tarr.append({x}1)")
+                    for m in range(len(data[:,:])):
+                        if data[m,14] == x:
+                            exec(f"{x}1.append(data[m,:])")
+                for _ in tarr:
+                    self.create_ap_order(file, data, filename)
 
 if __name__ == "__main__":
     ime = importExcel()
